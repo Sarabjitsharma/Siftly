@@ -4,7 +4,7 @@ embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
 def embed_query(query:str):
-    query = "quer: " + query
+    query = query
     embedding = embedding_model.encode(
         [query],
         normalize_embeddings=True
@@ -13,7 +13,7 @@ def embed_query(query:str):
 
 
 def embed_chunks(chunks):
-    texts = ["passage: " + chunk["text"] for chunk in chunks]
+    texts = [chunk["text"] for chunk in chunks]
 
     embeddings = embedding_model.encode(
         texts,
