@@ -1,5 +1,11 @@
-from pytube import YouTube
+import requests
 
 def fetch_video_title(url: str):
-    yt = YouTube(url)
-    return yt.title
+
+    endpoint = f"https://www.youtube.com/oembed?url={url}&format=json"
+
+    response = requests.get(endpoint)
+
+    data = response.json()
+
+    return data["title"]

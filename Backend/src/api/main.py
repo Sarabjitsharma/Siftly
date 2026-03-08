@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 
 from src.ingestion.youtube_transcript import fetch_transcript
@@ -29,16 +30,20 @@ store = FAISSVectorStore()
 
 video_metadata = {}
 
+class IngestRequest(BaseModel):
+    url: str
+
 
 @app.post("/ingest")
-def ingest_video(url: str):
-
+def ingest_video(data:IngestRequest):
+    print(data)
     try:
-
+        url = data.url
+        # print(url)
         transcript, video_id = fetch_transcript(url)
-
-        # title = fetch_video_title(url)
-
+        
+        title = fetch_video_title(url)
+        
         # reset previous embeddings
         store.reset()
 
@@ -51,15 +56,15 @@ def ingest_video(url: str):
         thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
 
         video_metadata["video_id"] = video_id
-        video_metadata["title"] = "title"
+        video_metadata["title"] = title
         video_metadata["thumbnail"] = thumbnail
 
         return {
             "status": "ingested",
-            "title": "title",
+            "url":f"{url}",
+            "title": title,
             "video_id": video_id,
             "thumbnail": thumbnail,
-            "num_chunks": len(chunks)
         }
 
     except Exception as e:
@@ -69,8 +74,16 @@ def ingest_video(url: str):
             "message": str(e)
         }
 
+
+from fastapi import HTTPException
+
+class IngestQuery(BaseModel):
+    query: str
+
 @app.post("/query")
-def ask_question(query: str):
+def ask_question(input: IngestQuery):
+
+    query = input.query
 
     query_embedding = embed_query(query)
 

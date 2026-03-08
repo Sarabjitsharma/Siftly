@@ -44,7 +44,8 @@ interface ChatInterfaceProps {
   videoId: string;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ videoId }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = () => {
+  // console.log(videoId);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -79,6 +80,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ videoId }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept':'application/json'
         },
         body: JSON.stringify({ query: queryText }),
       });
@@ -121,7 +123,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ videoId }) => {
       <div className="chat-header glass-panel">
         <Bot size={20} className="text-accent" />
         <div className="header-info">
-          <h3>RAG Assistant</h3>
+          <h3>Siftly</h3>
           <span className="status-online">● Ready</span>
         </div>
       </div>

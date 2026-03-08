@@ -15,7 +15,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ video, onChangeVideo }) => {
       {/* Header spanning top */}
       <header className="layout-header glass-panel">
         <div className="logo">
-          <span className="logo-icon">▶</span> Siftly RAG
+          <span className="logo-icon">▶</span> Siftly
         </div>
       </header>
 

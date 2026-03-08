@@ -13,6 +13,7 @@ const SourcePanel: React.FC<SourcePanelProps> = ({ video, onChangeVideo }) => {
   const [showTranscript] = useState(true);
 
   const videoDetails = {
+    url: video.url || "www.youtube.com",
     title: video.title || `YouTube Video (${video.video_id})`,
     channel: "Siftly Imported Video",
     duration: "Unknown",
@@ -33,32 +34,40 @@ const SourcePanel: React.FC<SourcePanelProps> = ({ video, onChangeVideo }) => {
         </button>
       </div>
 
-      <div className="source-content" style={{ marginTop: '1.5rem' }}>
+      <div className="source-content" style={{ marginTop: '1.5rem' }} >
         <AnimatePresence mode="wait">
-          <motion.div 
+          <motion.div
             key="video-content"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0}}
             className="video-content"
           >
-            <div className="video-card glass-panel">
-              <div className="thumbnail-wrapper">
-                <img src={videoDetails.thumbnail} alt={videoDetails.title} className="thumbnail" />
-                <div className="play-overlay">
-                  <PlayCircle size={40} />
-                </div>
-              </div>
-              <div className="video-info">
-                <h3 title={videoDetails.title} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{videoDetails.title}</h3>
-                <p>{videoDetails.channel}</p>
-                <div className="status-badge" style={{ marginTop: '0.5rem' }}>
-                  <CheckCircle2 size={14} className="success-icon" /> {video.num_chunks} chunks indexed
-                </div>
-              </div>
-            </div>
+            <a
+              href={videoDetails.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
 
+              <div className="video-card glass-panel">
+                <div className="thumbnail-wrapper">
+                  <img src={videoDetails.thumbnail} alt={videoDetails.title} className="thumbnail" />
+                  <div className="play-overlay">
+                    <PlayCircle size={40} />
+                  </div>
+                </div>
+                <div className="video-info">
+                  <h3 title={videoDetails.title} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{videoDetails.title}</h3>
+                  <p>{videoDetails.channel}</p>
+                  <div className="status-badge" style={{ marginTop: '0.5rem' }}>
+                    <CheckCircle2 size={14} className="success-icon" />
+                  </div>
+                </div>
+              </div>
+
+            </a>
             {showTranscript && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 className="transcript-section"
@@ -69,7 +78,7 @@ const SourcePanel: React.FC<SourcePanelProps> = ({ video, onChangeVideo }) => {
                 </div>
                 <div className="transcript-box glass-panel">
                   <p>
-                    Successfully extracted and indexed <strong>{video.num_chunks}</strong> chunks of context from this video. The RAG system is fully initialized and ready to answer your questions.
+                    Successfully extracted and indexed chunks of context from this video. The RAG system is fully initialized and ready to answer your questions.
                   </p>
                 </div>
               </motion.div>

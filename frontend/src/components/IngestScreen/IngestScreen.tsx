@@ -3,9 +3,9 @@ import { Youtube } from 'lucide-react';
 import './IngestScreen.css';
 
 export interface IngestResponse {
+  url:string,
   video_id: string;
   thumbnail: string;
-  num_chunks: number;
   title?: string;
 }
 
@@ -32,19 +32,20 @@ const IngestScreen: React.FC<IngestScreenProps> = ({ onIngestSuccess }) => {
       const response = await fetch(`http://127.0.0.1:8000/ingest`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({ url: url.trim() }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process video. Make sure the backend is running.');
+        throw new Error('Failed to process video.');
       }
 
       const data = await response.json();
 
-      if (data.status === "Couldn't find a video") {
-        throw new Error("Couldn't find a video");
+      if (data.status === "error") {
+        throw new Error(data.message);
       }
 
       onIngestSuccess(data as IngestResponse);
@@ -60,7 +61,7 @@ const IngestScreen: React.FC<IngestScreenProps> = ({ onIngestSuccess }) => {
       <div className="ingest-content">
         <div className="ingest-header">
           <div className="logo-icon">▶</div>
-          <h1>Siftly RAG</h1>
+          <h1>Siftly</h1>
           <p>Enter a YouTube video link to chat with its content</p>
         </div>
 
