@@ -7,7 +7,7 @@ def get_embedding_model():
     global embedding_model
 
     if embedding_model is None:
-        embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device='cpu')
 
     return embedding_model
 

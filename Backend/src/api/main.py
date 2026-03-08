@@ -34,6 +34,9 @@ video_metadata = {}
 class IngestRequest(BaseModel):
     url: str
 
+@app.get("/")
+def root():
+    return {"status": "running"}
 
 @app.post("/ingest")
 def ingest_video(data:IngestRequest):
