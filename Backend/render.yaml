@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: siftly-backend
+    runtime: python
+    pythonVersion: 3.12.3
