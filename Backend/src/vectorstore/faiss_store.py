@@ -3,7 +3,7 @@ import numpy as np
 
 
 class FAISSVectorStore:
-    def __init__(self, dimensions=768):
+    def __init__(self, dimensions=384):
         self.dimensions = dimensions
         self.index = faiss.IndexFlatIP(dimensions)
         self.metadata = []
