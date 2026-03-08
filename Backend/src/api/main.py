@@ -15,6 +15,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
+    "https://siftly-kappa.vercel.app/"
 ]
 
 app.add_middleware(

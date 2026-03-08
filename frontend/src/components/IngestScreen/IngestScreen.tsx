@@ -29,7 +29,8 @@ const IngestScreen: React.FC<IngestScreenProps> = ({ onIngestSuccess }) => {
     setError(null);
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/ingest`, {
+      // const response = await fetch(`http://127.0.0.1:8000/ingest`, {
+      const response = await fetch(`https://siftly-8fh4.onrender.com/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
