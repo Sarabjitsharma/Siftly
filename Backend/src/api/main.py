@@ -4,11 +4,13 @@ from pydantic import BaseModel
 
 
 from src.ingestion.youtube_transcript import fetch_transcript
-from src.processing.chunking import chunk_transcript
+# from src.processing.chunking import chunk_transcript
+from src.retrieval.parent_child import create_parent_child_chunks, get_parent_context
 from src.embeddings.embeddings import embed_chunks, embed_query
+
 from src.vectorstore.faiss_store import FAISSVectorStore
-from src.processing.context import build_context
-from src.llm.GroqLLM import generate_answer
+# from src.processing.context import build_context
+from src.llm.GroqLLM import generate_answer, llm_model
 from src.ingestion.video_metadata import fetch_video_title
 
 app = FastAPI()
@@ -28,6 +30,7 @@ app.add_middleware(
 
 
 store = FAISSVectorStore()
+parent_chunks = None
 
 video_metadata = {}
 
@@ -50,12 +53,12 @@ def ingest_video(data:IngestRequest):
         
         # reset previous embeddings
         store.reset()
+        global parent_chunks
+        parent_chunks, child_chunks = create_parent_child_chunks(transcript)
 
-        chunks = chunk_transcript(transcript)
+        embeddings = embed_chunks(child_chunks)
 
-        embeddings = embed_chunks(chunks)
-
-        store.add(embeddings, chunks)
+        store.add(embeddings, child_chunks)
 
         thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
 
@@ -72,32 +75,46 @@ def ingest_video(data:IngestRequest):
         }
 
     except Exception as e:
-
+        print(e)
         return {
             "status": "error",
             "message": str(e)
         }
 
-
-from fastapi import HTTPException
+from src.retrieval.hyde import hyde_query
+from src.retrieval.multi_query import generate_multi_queries
+from langchain_groq import ChatGroq
 
 class IngestQuery(BaseModel):
     query: str
 
 @app.post("/query")
 def ask_question(input: IngestQuery):
-
+    if parent_chunks is None:
+        return {"answer": "No video ingested yet"}
+    
     query = input.query
 
-    query_embedding = embed_query(query)
+    hypothetical_doc = hyde_query(query, llm_model)
+    queries = generate_multi_queries(query, llm_model)
+    queries.append(hypothetical_doc)
 
-    results = store.search(query_embedding, k=5)
+    print(hypothetical_doc)
+    print(queries)
 
-    context = build_context(results)
+    all_results = []
 
-    answer = generate_answer(query, context)
+    for q in queries:
+        query_embedding = embed_query(q)
+        result = store.search(query_embedding, k=3)
+        all_results.extend(result)
+
+    context = get_parent_context(all_results, parent_chunks)
+
+    final_context = "\n\n".join(context)
+    answer = generate_answer(query, final_context)
 
     return {
         "answer": answer,
-        "sources": results
+        "sources": context
     }
